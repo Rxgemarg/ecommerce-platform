@@ -1,0 +1,45 @@
+
+> @ecommerce/api@0.1.0 lint /home/fouad/Desktop/vs store/apps/api
+> eslint "{src,apps,libs,test}/**/*.ts" --fix
+
+
+/home/fouad/Desktop/vs store/apps/api/src/app.module.ts
+  2:24  warning  'ConfigService' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/fouad/Desktop/vs store/apps/api/src/modules/auth/auth.service.ts
+    4:3   warning  'BadRequestException' is defined but never used     @typescript-eslint/no-unused-vars
+  228:13  warning  'password_hash' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/fouad/Desktop/vs store/apps/api/src/modules/auth/guards/csrf.guard.ts
+  8:13  warning  'crypto' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/fouad/Desktop/vs store/apps/api/src/modules/coupons/coupons.service.ts
+  11:10  warning  'slugify' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/fouad/Desktop/vs store/apps/api/src/modules/coupons/dto/create-coupon.dto.ts
+  7:3  warning  'Min' is defined but never used  @typescript-eslint/no-unused-vars
+  8:3  warning  'Max' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/fouad/Desktop/vs store/apps/api/src/modules/coupons/dto/update-coupon.dto.ts
+   1:10  warning  'PartialType' is defined but never used      @typescript-eslint/no-unused-vars
+   2:10  warning  'CreateCouponDto' is defined but never used  @typescript-eslint/no-unused-vars
+   9:3   warning  'Min' is defined but never used              @typescript-eslint/no-unused-vars
+  10:3   warning  'Max' is defined but never used              @typescript-eslint/no-unused-vars
+
+/home/fouad/Desktop/vs store/apps/api/src/modules/orders/orders.service.ts
+  5:3  warning  'ConflictException' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/fouad/Desktop/vs store/apps/api/src/modules/product-types/dto/update-product-type.dto.ts
+  1:10  warning  'PartialType' is defined but never used           @typescript-eslint/no-unused-vars
+  2:10  warning  'CreateProductTypeDto' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/fouad/Desktop/vs store/apps/api/src/modules/products/dto/update-product.dto.ts
+  1:10  warning  'PartialType' is defined but never used       @typescript-eslint/no-unused-vars
+  2:10  warning  'CreateProductDto' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/fouad/Desktop/vs store/apps/api/src/modules/users/dto/update-user.dto.ts
+  1:10  warning  'PartialType' is defined but never used    @typescript-eslint/no-unused-vars
+  2:10  warning  'CreateUserDto' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 18 problems (0 errors, 18 warnings)
+

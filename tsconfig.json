@@ -1,0 +1,28 @@
+{
+  "extends": "./packages/config/typescript/base.json",
+  "include": [
+    "packages/**/*",
+    "apps/**/*",
+    "types/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    "**/*.js",
+    "apps/*/dist",
+    "apps/*/.next",
+    "apps/*/build"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "@ecommerce/config": ["./packages/config"],
+      "@ecommerce/validators": ["./packages/validators/src"],
+      "@ecommerce/ui": ["./packages/ui/src"],
+      "@ecommerce/api": ["./apps/api/src"],
+      "@ecommerce/storefront": ["./apps/storefront/src"],
+      "@ecommerce/admin": ["./apps/admin/src"]
+    }
+  }
+}

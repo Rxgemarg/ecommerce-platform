@@ -1,0 +1,236 @@
+// SQLite Prisma schema for development
+// This is a simplified version for local development
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Users table - Core authentication and authorization
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password_hash String
+  role          String   @default("VIEWER") // OWNER, ADMIN, MANAGER, SUPPORT, VIEWER
+  first_name    String?
+  last_name     String?
+  phone         String?
+  email_verified Boolean  @default(false)
+  active        Boolean  @default(true)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  last_login_at DateTime?
+
+  // Relations
+  sessions      Session[]
+  orders        Order[]
+  audit_logs    AuditLog[]
+  events        Event[]
+
+  @@map("users")
+}
+
+// Session management for cookie-based auth
+model Session {
+  id           String   @id @default(uuid())
+  user_id      String
+  session_token String  @unique
+  csrf_token   String?
+  ip_address   String?
+  user_agent   String?
+  expires_at   DateTime
+  created_at   DateTime @default(now())
+  last_accessed DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// Product Types - Dynamic schema definitions
+model ProductType {
+  id                  String  @id @default(uuid())
+  name                String
+  slug                String  @unique
+  description         String?
+  schema_json         String  // JSON as string for SQLite
+  ui_schema_json      String? // JSON as string for SQLite
+  search_facets_json  String? // JSON as string for SQLite
+  active              Boolean @default(true)
+  sort_order          Int     @default(0)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  // Relations
+  products Product[]
+
+  @@map("product_types")
+}
+
+// Products - Core catalog
+model Product {
+  id              String        @id @default(uuid())
+  type_id         String
+  title           String
+  slug            String
+  description     String?
+  status          String        @default("DRAFT") // DRAFT, ACTIVE, INACTIVE, ARCHIVED
+  base_price      Float         @default(0)
+  currency        String        @default("USD")
+  sku_base        String?
+  attributes_json String?       // JSON as string for SQLite
+  seo_title       String?
+  seo_description String?
+  meta_tags       String?       // JSON as string for SQLite
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+
+  // Relations
+  type     ProductType   @relation(fields: [type_id], references: [id])
+  variants ProductVariant[]
+  order_items OrderItem[]
+  events Event[]
+
+  @@unique([type_id, slug])
+  @@map("products")
+}
+
+// Product Variants - Size, color, etc.
+model ProductVariant {
+  id             String   @id @default(uuid())
+  product_id     String
+  sku            String   @unique
+  title          String?
+  price_override Float?
+  inventory_qty  Int      @default(0)
+  weight         Float?
+  dimensions    String?  // JSON as string for SQLite
+  options_json   String?  // JSON as string for SQLite
+  image_urls     String?  // JSON as string for SQLite
+  active         Boolean  @default(true)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  // Relations
+  product     Product     @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  order_items OrderItem[]
+
+  @@map("product_variants")
+}
+
+// Orders
+model Order {
+  id                String      @id @default(uuid())
+  user_id           String?
+  order_number      String      @unique
+  status            String      @default("PENDING") // PENDING, PAID, PROCESSING, SHIPPED, DELIVERED, CANCELLED, REFUNDED
+  currency          String      @default("USD")
+  subtotal          Float       @default(0)
+  tax_amount        Float       @default(0)
+  shipping_amount   Float       @default(0)
+  discount_amount   Float       @default(0)
+  total_amount      Float
+  shipping_address  String?     // JSON as string for SQLite
+  billing_address   String?     // JSON as string for SQLite
+  notes             String?
+  coupon_id         String?
+  paid_at           DateTime?
+  shipped_at        DateTime?
+  delivered_at      DateTime?
+  cancelled_at      DateTime?
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
+
+  // Relations
+  user       User?       @relation(fields: [user_id], references: [id])
+  coupon     Coupon?     @relation(fields: [coupon_id], references: [id])
+  items      OrderItem[]
+  events     Event[]
+  audit_logs AuditLog[]
+
+  @@map("orders")
+}
+
+// Order Items
+model OrderItem {
+  id          String  @id @default(uuid())
+  order_id    String
+  variant_id  String
+  quantity    Int
+  unit_price  Float
+  total_price Float
+  created_at  DateTime @default(now())
+
+  // Relations
+  order   Order         @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  variant ProductVariant @relation(fields: [variant_id], references: [id])
+
+  @@map("order_items")
+}
+
+// Coupons
+model Coupon {
+  id             String        @id @default(uuid())
+  code           String        @unique
+  type           String        // PERCENTAGE, FIXED_AMOUNT
+  value          Float
+  minimum_amount Float?
+  usage_limit    Int?
+  usage_count    Int           @default(0)
+  active         Boolean       @default(true)
+  expires_at     DateTime?
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+
+  // Relations
+  orders Order[]
+
+  @@map("coupons")
+}
+
+// Audit Logs - Track all write operations
+model AuditLog {
+  id            String          @id @default(uuid())
+  actor_user_id String?
+  order_id      String?
+  action        String          // CREATE, UPDATE, DELETE, LOGIN, LOGOUT
+  entity        String          // table name
+  entity_id     String
+  old_values    String?         // JSON as string for SQLite
+  new_values    String?         // JSON as string for SQLite
+  ip_address    String?
+  user_agent    String?
+  created_at    DateTime        @default(now())
+
+  // Relations
+  actor_user User? @relation(fields: [actor_user_id], references: [id])
+  order      Order? @relation(fields: [order_id], references: [id])
+
+  @@map("audit_logs")
+}
+
+// Events - Analytics and tracking
+model Event {
+  id           String     @id @default(uuid())
+  type         String     // PAGE_VIEW, PRODUCT_VIEW, ADD_TO_CART, etc.
+  user_id      String?
+  session_id   String?
+  product_id   String?
+  order_id     String?
+  payload      String?    // JSON as string for SQLite
+  ip_address   String?
+  user_agent   String?
+  created_at   DateTime   @default(now())
+
+  // Relations
+  user    User?   @relation(fields: [user_id], references: [id])
+  product Product? @relation(fields: [product_id], references: [id])
+  order   Order?  @relation(fields: [order_id], references: [id])
+
+  @@map("events")
+}

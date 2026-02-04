@@ -1,0 +1,40 @@
+# Render Deployment Configuration
+# Deploy this API to Render.com
+
+services:
+  - type: web
+    name: ecommerce-api
+    runtime: docker
+    repo: https://github.com/YOUR_USERNAME/ecommerce-platform
+    plan: standard
+    region: oregon
+    branch: main
+    dockerfilePath: ./apps/api/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_PORT
+        value: 3001
+      - key: DATABASE_URL
+        sync: false  # Set in Render dashboard
+      - key: DIRECT_URL
+        sync: false  # Set in Render dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        sync: false  # Set to your Vercel domains
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 100
+    healthCheckPath: /api/v1/product-types
+    buildFilter:
+      paths:
+        - apps/api/**
+        - packages/**
+        - package.json
+        - pnpm-lock.yaml
+        - pnpm-workspace.yaml
+        - turbo.json

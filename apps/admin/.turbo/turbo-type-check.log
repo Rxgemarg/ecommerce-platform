@@ -1,0 +1,4 @@
+
+> @ecommerce/admin@0.1.0 type-check /home/fouad/Desktop/vs store/apps/admin
+> tsc --noEmit
+

@@ -1,0 +1,32 @@
+{
+  "name": "ecommerce-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Production-ready e-commerce platform with dynamic product types",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "type-check": "turbo run type-check",
+    "db:generate": "turbo run db:generate",
+    "db:push": "turbo run db:push",
+    "db:migrate": "turbo run db:migrate",
+    "dev:api": "turbo run dev --filter=@ecommerce/api",
+    "dev:storefront": "turbo run dev --filter=@ecommerce/storefront",
+    "dev:admin": "turbo run dev --filter=@ecommerce/admin",
+    "setup": "./scripts/dev.sh setup",
+    "start": "npm run dev",
+    "clean": "./scripts/dev.sh clean"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "turbo": "^1.12.4",
+    "typescript": "^5.3.3"
+  },
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=8.0.0"
+  }
+}

@@ -1,0 +1,575 @@
+{
+  "info": {
+    "name": "E-Commerce Platform API",
+    "description": "Complete API collection for the e-commerce platform with dynamic product types",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "sessionToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "value",
+        "value": "{{sessionToken}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "cookie",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\",\n  \"first_name\": \"Admin\",\n  \"last_name\": \"User\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Product Types",
+      "item": [
+        {
+          "name": "Create Product Type",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Clothing\",\n  \"slug\": \"clothing\",\n  \"schema_json\": {\n    \"fields\": [\n      {\n        \"key\": \"material\",\n        \"label\": \"Material\",\n        \"type\": \"enum\",\n        \"options\": [\"Cotton\", \"Polyester\", \"Wool\", \"Silk\"],\n        \"required\": true\n      },\n      {\n        \"key\": \"size\",\n        \"label\": \"Size\",\n        \"type\": \"enum\",\n        \"options\": [\"XS\", \"S\", \"M\", \"L\", \"XL\", \"XXL\"],\n        \"required\": true\n      },\n      {\n        \"key\": \"weight\",\n        \"label\": \"Weight (grams)\",\n        \"type\": \"measurement\",\n        \"unit\": \"g\",\n        \"required\": false\n      },\n      {\n        \"key\": \"care_instructions\",\n        \"label\": \"Care Instructions\",\n        \"type\": \"string\",\n        \"required\": false\n      }\n    ]\n  },\n  \"ui_schema_json\": {\n    \"layout\": \"sections\",\n    \"sections\": [\n      {\n        \"title\": \"Basic Information\",\n        \"fields\": [\"material\", \"size\"]\n      },\n      {\n        \"title\": \"Additional Details\",\n        \"fields\": [\"weight\", \"care_instructions\"]\n      }\n    ]\n  },\n  \"search_facets_json\": {\n    \"facets\": [\n      {\n        \"key\": \"material\",\n        \"label\": \"Material\",\n        \"type\": \"checkbox\"\n      },\n      {\n        \"key\": \"size\",\n        \"label\": \"Size\",\n        \"type\": \"checkbox\"\n      }\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/product-types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "product-types"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Product Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/product-types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "product-types"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product Type by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/product-types/{{productTypeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "product-types",
+                "{{productTypeId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product Type",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Clothing Updated\",\n  \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/product-types/{{productTypeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "product-types",
+                "{{productTypeId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type_id\": \"{{productTypeId}}\",\n  \"title\": \"Men's Cotton T-Shirt\",\n  \"description\": \"Comfortable cotton t-shirt for everyday wear\",\n  \"base_price\": 29.99,\n  \"sku_base\": \"TSHIRT-COTTON\",\n  \"attributes_json\": {\n    \"material\": \"Cotton\",\n    \"size\": \"M\",\n    \"weight\": {\n      \"value\": 180,\n      \"unit\": \"g\"\n    },\n    \"care_instructions\": \"Machine wash cold, tumble dry low\"\n  },\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/search?q=tshirt&type_id={{productTypeId}}&min_price=10&max_price=100&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "search"
+              ]
+            },
+            "query": [
+              {
+                "key": "q",
+                "value": "tshirt"
+              },
+              {
+                "key": "type_id",
+                "value": "{{productTypeId}}"
+              },
+              {
+                "key": "min_price",
+                "value": "10"
+              },
+              {
+                "key": "max_price",
+                "value": "100"
+              },
+              {
+                "key": "page",
+                "value": "1"
+              },
+              {
+                "key": "limit",
+                "value": "10"
+              }
+            ]
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ]
+            },
+            "query": [
+              {
+                "key": "page",
+                "value": "1"
+              },
+              {
+                "key": "limit",
+                "value": "10"
+              }
+            ]
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/{{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{productId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"variant_id\": \"{{variantId}}\",\n      \"quantity\": 2\n    }\n  ],\n  \"shipping_address\": {\n    \"street\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zip_code\": \"10001\",\n    \"country\": \"USA\"\n  },\n  \"billing_address\": {\n    \"street\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zip_code\": \"10001\",\n    \"country\": \"USA\"\n  },\n  \"currency\": \"USD\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "query": [
+              {
+                "key": "page",
+                "value": "1"
+              },
+              {
+                "key": "limit",
+                "value": "10"
+              }
+            ]
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/my?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "my"
+              ]
+            },
+            "query": [
+              {
+                "key": "page",
+                "value": "1"
+              },
+              {
+                "key": "limit",
+                "value": "10"
+              }
+            ]
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PAID\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{orderId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{orderId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Coupons",
+      "item": [
+        {
+          "name": "Create Coupon",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"SAVE20\",\n  \"type\": \"PERCENTAGE\",\n  \"value\": 20,\n  \"minimum_amount\": 50,\n  \"usage_limit\": 100,\n  \"expires_at\": \"2024-12-31T23:59:59Z\",\n  \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/coupons",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "coupons"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Validate Coupon",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/coupons/code/SAVE20?subtotal=75",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "coupons",
+                "code",
+                "SAVE20"
+              ]
+            },
+            "query": [
+              {
+                "key": "subtotal",
+                "value": "75"
+              }
+            ]
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Track Event",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PRODUCT_VIEW\",\n  \"product_id\": \"{{productId}}\",\n  \"payload\": {\n    \"product_id\": \"{{productId}}\",\n    \"source\": \"search\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/track",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "track"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Dashboard KPIs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/dashboard?start=2024-01-01&end=2024-12-31",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "dashboard"
+              ]
+            },
+            "query": [
+              {
+                "key": "start",
+                "value": "2024-01-01"
+              },
+              {
+                "key": "end",
+                "value": "2024-12-31"
+              }
+            ]
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

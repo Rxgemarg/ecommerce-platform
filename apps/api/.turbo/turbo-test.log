@@ -1,0 +1,13 @@
+
+> @ecommerce/api@0.1.0 test /home/fouad/Desktop/vs store/apps/api
+> jest
+
+No tests found, exiting with code 1
+Run with `--passWithNoTests` to exit with code 0
+In /home/fouad/Desktop/vs store/apps/api/src
+  51 files checked.
+  testMatch:  - 0 matches
+  testPathIgnorePatterns: /node_modules/ - 51 matches
+  testRegex: .*\.spec\.ts$ - 0 matches
+Pattern:  - 0 matches
+ ELIFECYCLE  Test failed. See above for more details.

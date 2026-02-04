@@ -1,0 +1,291 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Users table - Core authentication and authorization
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  password_hash  String
+  role           UserRole  @default(VIEWER)
+  first_name     String?
+  last_name      String?
+  phone          String?
+  email_verified Boolean   @default(false)
+  active         Boolean   @default(true)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+  last_login_at  DateTime?
+
+  // Relations
+  sessions   Session[]
+  orders     Order[]
+  audit_logs AuditLog[]
+  events     Event[]
+
+  @@map("users")
+}
+
+// Session management for cookie-based auth
+model Session {
+  id            String   @id @default(uuid())
+  user_id       String
+  session_token String   @unique
+  csrf_token    String?
+  ip_address    String?
+  user_agent    String?
+  expires_at    DateTime
+  created_at    DateTime @default(now())
+  last_accessed DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// Product Types - Dynamic schema definitions
+model ProductType {
+  id                 String   @id @default(uuid())
+  name               String
+  slug               String   @unique
+  description        String?
+  schema_json        Json // Dynamic field definitions
+  ui_schema_json     Json? // UI configuration for forms
+  search_facets_json Json? // Which fields to use as facets
+  active             Boolean  @default(true)
+  sort_order         Int      @default(0)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  // Relations
+  products Product[]
+
+  @@map("product_types")
+}
+
+// Products - Core catalog
+model Product {
+  id              String        @id @default(uuid())
+  type_id         String
+  title           String
+  slug            String
+  description     String?
+  status          ProductStatus @default(DRAFT)
+  base_price      Decimal       @db.Decimal(10, 2)
+  currency        String        @default("USD")
+  sku_base        String?
+  attributes_json Json? // Dynamic attributes based on product type
+  seo_title       String?
+  seo_description String?
+  meta_tags       Json?
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+
+  // Relations
+  type        ProductType      @relation(fields: [type_id], references: [id])
+  variants    ProductVariant[]
+  order_items OrderItem[]
+  events      Event[]
+
+  @@unique([type_id, slug])
+  @@map("products")
+}
+
+// Product Variants - Size, color, etc.
+model ProductVariant {
+  id             String   @id @default(uuid())
+  product_id     String
+  sku            String   @unique
+  title          String?
+  price_override Decimal? @db.Decimal(10, 2)
+  inventory_qty  Int      @default(0)
+  weight         Decimal? @db.Decimal(8, 3)
+  dimensions     Json? // {length, width, height}
+  options_json   Json? // Variant options like {size: "L", color: "red"}
+  image_urls     Json? // Array of image URLs
+  active         Boolean  @default(true)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  // Relations
+  product     Product     @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  order_items OrderItem[]
+
+  @@map("product_variants")
+}
+
+// Orders
+model Order {
+  id               String      @id @default(uuid())
+  user_id          String?
+  order_number     String      @unique
+  status           OrderStatus @default(PENDING)
+  currency         String      @default("USD")
+  subtotal          Decimal     @db.Decimal(10, 2)
+  tax_amount        Decimal     @default(0.00) @db.Decimal(10, 2)
+  shipping_amount   Decimal     @default(0.00) @db.Decimal(10, 2)
+  discount_amount   Decimal     @default(0.00) @db.Decimal(10, 2)
+  total_amount      Decimal     @db.Decimal(10, 2)
+  shipping_address Json? // Address object
+  billing_address  Json? // Address object
+  notes            String?
+  coupon_id        String?
+  paid_at          DateTime?
+  shipped_at       DateTime?
+  delivered_at     DateTime?
+  cancelled_at     DateTime?
+  created_at       DateTime    @default(now())
+  updated_at       DateTime    @updatedAt
+
+  // Relations
+  user       User?       @relation(fields: [user_id], references: [id])
+  coupon     Coupon?     @relation(fields: [coupon_id], references: [id])
+  items      OrderItem[]
+  events     Event[]
+  audit_logs AuditLog[]
+
+  @@map("orders")
+}
+
+// Order Items
+model OrderItem {
+  id          String   @id @default(uuid())
+  order_id    String
+  variant_id  String
+  quantity    Int
+  unit_price  Decimal @db.Decimal(10, 2)
+  total_price Decimal @db.Decimal(10, 2)
+  created_at  DateTime @default(now())
+
+  // Relations
+  order     Order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  variant   ProductVariant @relation(fields: [variant_id], references: [id])
+  Product   Product?       @relation(fields: [productId], references: [id])
+  productId String?
+
+  @@map("order_items")
+}
+
+// Coupons
+model Coupon {
+  id             String     @id @default(uuid())
+  code           String     @unique
+  type           CouponType
+  value          Decimal       @db.Decimal(10, 2)
+  minimum_amount Decimal?      @db.Decimal(10, 2)
+  usage_limit    Int?
+  usage_count    Int        @default(0)
+  active         Boolean    @default(true)
+  expires_at     DateTime?
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+
+  // Relations
+  orders Order[]
+
+  @@map("coupons")
+}
+
+// Audit Logs - Track all write operations
+model AuditLog {
+  id            String      @id @default(uuid())
+  actor_user_id String?
+  order_id      String?
+  action        AuditAction
+  entity        String // table name
+  entity_id     String
+  old_values    Json?
+  new_values    Json?
+  ip_address    String?
+  user_agent    String?
+  created_at    DateTime    @default(now())
+
+  // Relations
+  actor_user User?  @relation(fields: [actor_user_id], references: [id])
+  order      Order? @relation(fields: [order_id], references: [id])
+
+  @@map("audit_logs")
+}
+
+// Events - Analytics and tracking
+model Event {
+  id         String    @id @default(uuid())
+  type       EventType
+  user_id    String?
+  session_id String?
+  product_id String?
+  order_id   String?
+  payload    Json? // Event data
+  ip_address String?
+  user_agent String?
+  created_at DateTime  @default(now())
+
+  // Relations
+  user    User?    @relation(fields: [user_id], references: [id])
+  product Product? @relation(fields: [product_id], references: [id])
+  order   Order?   @relation(fields: [order_id], references: [id])
+
+  @@index([type, created_at])
+  @@index([user_id, created_at])
+  @@map("events")
+}
+
+// Enums
+enum UserRole {
+  OWNER
+  ADMIN
+  MANAGER
+  SUPPORT
+  VIEWER
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+}
+
+enum EventType {
+  PAGE_VIEW
+  PRODUCT_VIEW
+  ADD_TO_CART
+  REMOVE_FROM_CART
+  SEARCH
+  CHECKOUT_START
+  CHECKOUT_COMPLETE
+  SIGNUP
+  LOGIN
+}
